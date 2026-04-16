@@ -117,9 +117,27 @@ Load both JSON files and run the analysis modules. Read `references/data-format.
 - Calculate from `events.damage_boss` tick timestamps
 - Gap > 2.5x median tick interval = downtime
 
-#### Module G: Buff Coverage
-- Categorize buffs: raid buffs, consumables, self CDs, externals, procs
-- Highlight missing consumables or significant uptime differences
+#### Module G: Buff Coverage (Critical)
+
+Buff uptime differences are often the single largest explainable factor in performance gaps. Treat this module with high priority.
+
+From `tables.buffs.auras`, categorize and compare uptime:
+
+**Tier 1 — Must-maintain (uptime gaps directly reduce throughput):**
+- Consumables: Flask, Food, Augment Rune, weapon enhancement — should be ~100%. Any gap = free stats lost
+- Self-maintenance buffs identified from the guide (spec-dependent, e.g., weapon imbues, stances, auras)
+- Key proc buffs that the player should optimize around (e.g., trinket procs, set bonuses)
+
+**Tier 2 — External buffs (affect comparison fairness):**
+- Augmentation Evoker buffs (Ebon Might, Prescience) — if one player has Aug and the other doesn't, this alone can explain 5-15% throughput difference
+- External Power Infusion — flag whether it was external or self-cast
+- Other externals (Innervate for healers, etc.)
+
+**Tier 3 — Raid buffs and misc:**
+- Standard raid buffs (Fortitude, Intellect, etc.)
+- Passive/proc effects
+
+For every Tier 1 buff with >5% uptime difference between the two players, flag it explicitly and estimate the throughput impact. Missing consumables should be called out prominently — they indicate preparation issues.
 
 #### Module H: Channeled Spell Analysis (if applicable)
 - Use `events.damage_boss` (NOT cast events) to count actual damage ticks

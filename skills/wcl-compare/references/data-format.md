@@ -14,7 +14,7 @@ Reference for the JSON structure output by `wcl_collect.py`. Read this when you 
 
 - `tables.damageDone` — damage table with sourceID filter; `entries` = abilities (each with name, total, hitCount, etc.)
 - `tables.damageDoneAll` — damage table without sourceID filter; `entries` = players, each containing an `abilities` sub-array
-- `tables.buffs` — buff uptime table; `auras` array
+- `tables.buffs` — buff uptime table; `auras` array. Each aura has: `name`, `guid`, `type`, `totalUptime` (ms), `totalUses`, `bands` (time ranges)
 - `tables.enemyDebuffs` — all debuffs on enemies; `auras` array (no source filter)
 
 ## Events (Raw)

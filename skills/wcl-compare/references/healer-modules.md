@@ -1,6 +1,20 @@
 # Healer Analysis Modules
 
-When the collected data shows `player.role == "healer"`, use these modules instead of the DPS-specific ones. Modules A (Overview & Stats) and G (Buff Coverage) remain the same for both roles.
+When the collected data shows `player.role == "healer"`, use these modules instead of the DPS-specific ones. Modules A (Overview & Stats) and G (Buff Coverage) remain the same for both roles, with the healer-specific additions below.
+
+## Module G Additions for Healers: Spec-Specific Must-Maintain Buffs
+
+In addition to the standard Tier 1 buffs (consumables, etc.), healers have spec-specific buffs that must be maintained for optimal throughput. Compare these uptimes carefully (verify current list with guide search):
+
+- **Restoration Druid**: Lifebloom (should be active on a target at all times), Efflorescence
+- **Discipline Priest**: Atonement count during ramp windows, Power Word: Shield uptime
+- **Holy Paladin**: Glimmer of Light count, Beacon of Light (must never drop)
+- **Restoration Shaman**: Earth Shield (should be near 100% on tank), Riptide coverage
+- **Mistweaver Monk**: Renewing Mist count, Enveloping Mist on key targets
+- **Preservation Evoker**: Echo count before ramp, Temporal Anomaly coverage
+- **Holy Priest**: Renew coverage, Prayer of Mending bounces
+
+A healer who lets Lifebloom or Earth Shield drop for extended periods is losing significant passive throughput. Flag any gaps > 5 seconds prominently.
 
 ## Module B (Healer): Healing Breakdown
 
