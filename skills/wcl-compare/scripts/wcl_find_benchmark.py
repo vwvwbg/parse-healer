@@ -12,6 +12,7 @@ Outputs the benchmark player's report code, fight ID, and name.
 
 import argparse
 import json
+import math
 import sys
 import time
 from wcl_client import get_token, query
@@ -54,7 +55,7 @@ def detect_external_conditions(collected: dict) -> dict:
 
     has_aug = False
     aug_uptime = 0
-    ext_pi_count = 0
+    pi_count = 0
 
     for b in buffs:
         name = b.get("name", "")
@@ -63,27 +64,24 @@ def detect_external_conditions(collected: dict) -> dict:
             if name == "Ebon Might":
                 aug_uptime = b.get("totalUptime", 0) / 1000 / duration * 100
 
-        # Detect external PI: if PI uses > Voidform uses (or similar CD count), likely external
         if name == EXT_PI_BUFF:
-            ext_pi_count = b.get("totalUses", 0)
+            pi_count = b.get("totalUses", 0)
 
-    # Count self-PI (should match major CD count)
-    voidform_count = 0
-    for b in buffs:
-        if b.get("name") in ("Voidform", "Dark Ascension", "Metamorphosis",
-                              "Combustion", "Icy Veins", "Avenging Wrath",
-                              "Celestial Alignment", "Pillar of Frost",
-                              "Summon Demonic Tyrant", "Deathborne"):
-            voidform_count = max(voidform_count, b.get("totalUses", 0))
-
-    has_ext_pi = ext_pi_count > voidform_count if voidform_count > 0 else False
+    # PI has a 120s CD. A player's expected self-PI count = ceil(duration / 120).
+    # Any PI beyond that is external (from another Priest).
+    # Note: Priests cast PI on themselves AND a target simultaneously,
+    # so a Priest's own PI count in the buff table = their self-casts.
+    expected_self_pi = math.ceil(duration / 120) if duration > 0 else 0
+    ext_pi_count = max(0, pi_count - expected_self_pi)
+    has_ext_pi = ext_pi_count > 0
 
     return {
         "has_aug": has_aug,
         "aug_uptime": aug_uptime,
         "has_ext_pi": has_ext_pi,
-        "pi_count": ext_pi_count,
-        "major_cd_count": voidform_count,
+        "pi_count": pi_count,
+        "ext_pi_count": ext_pi_count,
+        "expected_self_pi": expected_self_pi,
     }
 
 

@@ -89,7 +89,7 @@ Use WebSearch to find 2-3 guides for the identified spec from Wowhead, Icy Veins
 
 ### Step 4: Analyze Data
 
-Load both JSON files and run the analysis modules. Read `references/data-format.md` for the JSON structure details.
+Load both JSON files and run the analysis modules. Read `references/data-format.md` for the JSON structure details and `references/analysis-pitfalls.md` for known mistakes to avoid (ilvl calculation, CD times, PI detection).
 
 **If the player is a healer** (`player.role == "healer"`), read `references/healer-modules.md` for healer-specific module definitions. The key differences: healing breakdown replaces damage breakdown, cooldown timing replaces opener analysis, mana efficiency replaces DoT uptime, and overhealing analysis is added.
 
