@@ -12,46 +12,48 @@ API_URL = "https://www.warcraftlogs.com/api/v2/client"
 SCRIPT_DIR = Path(__file__).resolve().parent
 
 
+CONFIG_DIR = Path.home() / ".config" / "parse-healer"
+
+
+def _load_env_file(env_file: Path) -> tuple[str | None, str | None]:
+    """Parse a .env file and return (client_id, client_secret)."""
+    client_id = client_secret = None
+    if not env_file.exists():
+        return None, None
+    for line in env_file.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            key, value = line.split("=", 1)
+            key, value = key.strip(), value.strip()
+            if key == "WCL_CLIENT_ID":
+                client_id = value
+            elif key == "WCL_CLIENT_SECRET":
+                client_secret = value
+    return client_id, client_secret
+
+
 def _load_credentials():
-    """Load WCL credentials. Priority: env vars > .env file > settings.local.json."""
+    """Load WCL credentials. Priority: env vars > ~/.config/parse-healer/.env > scripts/.env."""
     client_id = os.environ.get("WCL_CLIENT_ID")
     client_secret = os.environ.get("WCL_CLIENT_SECRET")
     if client_id and client_secret:
         return client_id, client_secret
 
-    # Try .env in the scripts directory
-    env_file = SCRIPT_DIR / ".env"
-    if env_file.exists():
-        for line in env_file.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
-            if line and not line.startswith("#") and "=" in line:
-                key, value = line.split("=", 1)
-                key, value = key.strip(), value.strip()
-                if key == "WCL_CLIENT_ID":
-                    client_id = value
-                elif key == "WCL_CLIENT_SECRET":
-                    client_secret = value
-        if client_id and client_secret:
-            return client_id, client_secret
+    # Try persistent config directory (survives plugin updates)
+    client_id, client_secret = _load_env_file(CONFIG_DIR / ".env")
+    if client_id and client_secret:
+        return client_id, client_secret
 
-    # Try ~/.claude/settings.local.json
-    settings_file = Path.home() / ".claude" / "settings.local.json"
-    if settings_file.exists():
-        try:
-            settings = json.loads(settings_file.read_text(encoding="utf-8"))
-            wcl = settings.get("wcl", {})
-            client_id = wcl.get("clientId") or client_id
-            client_secret = wcl.get("clientSecret") or client_secret
-            if client_id and client_secret:
-                return client_id, client_secret
-        except (json.JSONDecodeError, AttributeError):
-            pass
+    # Fallback: .env in the scripts directory
+    client_id, client_secret = _load_env_file(SCRIPT_DIR / ".env")
+    if client_id and client_secret:
+        return client_id, client_secret
 
     raise RuntimeError(
         "WCL credentials not found. Set them up using one of:\n"
         "  1. Run /wcl-setup in Claude Code\n"
         "  2. Set WCL_CLIENT_ID and WCL_CLIENT_SECRET environment variables\n"
-        "  3. Create a .env file in the scripts directory\n"
+        "  3. Create ~/.config/parse-healer/.env with your credentials\n"
         "Get your API key at: https://www.warcraftlogs.com/api/clients"
     )
 

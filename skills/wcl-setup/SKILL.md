@@ -27,9 +27,10 @@ SCRIPTS_DIR="${CLAUDE_SKILL_DIR}/../wcl-compare/scripts"
 
 2. Ask the user for their **Client ID** and **Client Secret**.
 
-3. Write the credentials to a `.env` file in the scripts directory:
+3. Write the credentials to the persistent config directory (survives plugin updates):
 ```bash
-cat > "$SCRIPTS_DIR/.env" << 'ENVEOF'
+mkdir -p ~/.config/parse-healer
+cat > ~/.config/parse-healer/.env << 'ENVEOF'
 WCL_CLIENT_ID=<user_provided_id>
 WCL_CLIENT_SECRET=<user_provided_secret>
 ENVEOF
