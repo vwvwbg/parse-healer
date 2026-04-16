@@ -2,7 +2,7 @@
 
 > *Your parse needs healing? We got you.*
 
-A [Claude Code](https://claude.ai/claude-code) skill that analyzes World of Warcraft DPS performance by comparing Warcraft Logs data against top-ranked players and current spec guides.
+A [Claude Code](https://claude.ai/claude-code) plugin that analyzes World of Warcraft DPS performance by comparing Warcraft Logs data against top-ranked players and current spec guides.
 
 ## What It Does
 
@@ -14,36 +14,27 @@ A [Claude Code](https://claude.ai/claude-code) skill that analyzes World of Warc
 
 ## Requirements
 
-- [Claude Code](https://claude.ai/claude-code) (the CLI tool by Anthropic)
+- [Claude Code](https://claude.ai/claude-code) (CLI, desktop app, or IDE extension)
 - Python 3.11+
 - A free [Warcraft Logs API key](https://www.warcraftlogs.com/api/clients)
 
-## Setup
+## Installation
 
 ```bash
-git clone <this-repo> parse-healer
-cd parse-healer
-pip install -r requirements.txt
-
-# Set your WCL API credentials
-cp .env.example .env
-# Edit .env with your client ID and secret
-
-# Or export directly:
-export WCL_CLIENT_ID=your_id
-export WCL_CLIENT_SECRET=your_secret
+# In Claude Code, run:
+/plugin marketplace add vwvwbg/parse-healer
+/plugin install parse-healer@parse-healer
 ```
+
+Then set up your WCL API credentials:
+
+```
+/wcl-setup
+```
+
+Claude will walk you through getting and configuring your API key.
 
 ## Usage
-
-Launch Claude Code from the project directory:
-
-```bash
-cd parse-healer
-claude
-```
-
-Then use the skill:
 
 ```
 # Compare two specific logs
@@ -78,14 +69,30 @@ When you provide only one log, ParseHealer searches the WCL rankings for the sam
 
 ```
 parse-healer/
-├── .claude/skills/wcl-compare/
-│   └── SKILL.md              # Claude Code skill definition
-├── wcl_client.py             # WCL API v2 client
-├── wcl_collect.py            # Data collection (outputs JSON)
-├── wcl_find_benchmark.py     # Smart benchmark finder
+├── .claude-plugin/
+│   └── plugin.json               # Plugin manifest
+├── skills/
+│   ├── wcl-setup/
+│   │   └── SKILL.md              # API credential setup wizard
+│   └── wcl-compare/
+│       ├── SKILL.md              # Main analysis skill
+│       └── scripts/
+│           ├── wcl_client.py     # WCL API v2 client
+│           ├── wcl_collect.py    # Data collection
+│           └── wcl_find_benchmark.py  # Smart benchmark finder
 ├── requirements.txt
 └── .env.example
 ```
+
+## Credential Storage
+
+ParseHealer looks for WCL credentials in this order:
+
+1. Environment variables (`WCL_CLIENT_ID`, `WCL_CLIENT_SECRET`)
+2. `.env` file in the scripts directory
+3. `~/.claude/settings.local.json` under the `wcl` key
+
+The `/wcl-setup` skill handles this automatically.
 
 ## License
 

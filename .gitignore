@@ -4,3 +4,4 @@ __pycache__/
 /tmp/
 *.json
 !.env.example
+!.claude-plugin/plugin.json

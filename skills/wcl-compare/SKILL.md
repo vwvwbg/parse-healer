@@ -38,9 +38,14 @@ Note the patch number (e.g., 12.0.1 Midnight Season 1) for guide searches.
 
 Parse the report URL(s) to extract report code and fight ID.
 
-The Python scripts are in the project root directory. Run `wcl_collect.py` for each player:
+First, locate the scripts directory:
 ```bash
-python3 wcl_collect.py "<report_url>" <player_name> -o /tmp/wcl_player1.json
+SCRIPTS_DIR="$(python3 -c "from pathlib import Path; print(Path.home() / '.claude' / 'skills' / 'wcl-compare' / 'scripts')")"
+```
+
+Run `wcl_collect.py` for each player:
+```bash
+python3 "$SCRIPTS_DIR/wcl_collect.py" "<report_url>" <player_name> -o /tmp/wcl_player1.json
 ```
 
 From the output JSON, identify:
@@ -52,13 +57,13 @@ From the output JSON, identify:
 
 If only one report was provided, find a benchmark player:
 ```bash
-python3 wcl_find_benchmark.py /tmp/wcl_player1.json
+python3 "$SCRIPTS_DIR/wcl_find_benchmark.py" /tmp/wcl_player1.json
 ```
 
 The script outputs the benchmark's report code, fight ID, and player name.
 Then collect that player's data:
 ```bash
-python3 wcl_collect.py "<benchmark_report_code>" <fight_id> <benchmark_name> -o /tmp/wcl_player2.json
+python3 "$SCRIPTS_DIR/wcl_collect.py" "<benchmark_report_code>" <fight_id> <benchmark_name> -o /tmp/wcl_player2.json
 ```
 
 When reporting the benchmark selection, explain WHY this player was chosen (rank, matching conditions, etc.).

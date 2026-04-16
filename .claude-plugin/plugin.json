@@ -1,0 +1,10 @@
+{
+  "name": "parse-healer",
+  "description": "Analyze WoW DPS performance by comparing Warcraft Logs data against top-ranked players and spec guides",
+  "version": "1.0.0",
+  "author": {
+    "name": "vwvwbg"
+  },
+  "homepage": "https://github.com/vwvwbg/parse-healer",
+  "license": "MIT"
+}
