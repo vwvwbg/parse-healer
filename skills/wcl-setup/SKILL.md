@@ -1,13 +1,23 @@
 ---
 name: wcl-setup
-description: Configure Warcraft Logs API credentials for ParseHealer
+description: >
+  Configure Warcraft Logs API credentials for ParseHealer.
+  Use when the user wants to set up WCL API keys, configure
+  parse-healer credentials, or when wcl_client.py reports
+  missing credentials.
 disable-model-invocation: true
 argument-hint: ""
 ---
 
 # WCL Setup — Configure API Credentials
 
-Set up your Warcraft Logs API credentials so `/wcl-compare` can access log data.
+Set up Warcraft Logs API credentials so `/wcl-compare` can access log data.
+
+## Scripts
+
+```bash
+SCRIPTS_DIR="${CLAUDE_SKILL_DIR}/../wcl-compare/scripts"
+```
 
 ## Steps
 
@@ -17,24 +27,19 @@ Set up your Warcraft Logs API credentials so `/wcl-compare` can access log data.
 
 2. Ask the user for their **Client ID** and **Client Secret**.
 
-3. Determine the plugin's installed location by running:
+3. Write the credentials to a `.env` file in the scripts directory:
 ```bash
-find ~/.claude/plugins/cache/parse-healer -type d -name scripts -path '*/wcl-compare/*' 2>/dev/null | head -1
-```
-
-4. Write the credentials to a `.env` file in the scripts directory:
-```bash
-cat > "<scripts_dir>/.env" << 'ENVEOF'
+cat > "$SCRIPTS_DIR/.env" << 'ENVEOF'
 WCL_CLIENT_ID=<user_provided_id>
 WCL_CLIENT_SECRET=<user_provided_secret>
 ENVEOF
 ```
 
-5. Verify the credentials work:
+4. Verify the credentials work:
 ```bash
-python3 "<scripts_dir>/wcl_client.py"
+python3 "$SCRIPTS_DIR/wcl_client.py"
 ```
 
-If successful, it will print "Token obtained: ..." and rate limit info. If it fails, help the user troubleshoot (wrong credentials, expired client, etc.).
+If successful, it prints "Token obtained: ..." and rate limit info. If it fails, help troubleshoot (wrong credentials, expired client, etc.).
 
-6. Confirm setup is complete and remind the user they can now use `/wcl-compare`.
+5. Confirm setup is complete and remind the user they can now use `/wcl-compare`.
