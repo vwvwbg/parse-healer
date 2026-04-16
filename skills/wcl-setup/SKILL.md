@@ -19,7 +19,7 @@ Set up your Warcraft Logs API credentials so `/wcl-compare` can access log data.
 
 3. Determine the plugin's installed location by running:
 ```bash
-python3 -c "from pathlib import Path; print(Path.home() / '.claude' / 'skills' / 'wcl-compare' / 'scripts')"
+find ~/.claude/plugins/cache/parse-healer -type d -name scripts -path '*/wcl-compare/*' 2>/dev/null | head -1
 ```
 
 4. Write the credentials to a `.env` file in the scripts directory:

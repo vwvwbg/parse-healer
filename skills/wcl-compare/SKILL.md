@@ -40,7 +40,7 @@ Parse the report URL(s) to extract report code and fight ID.
 
 First, locate the scripts directory:
 ```bash
-SCRIPTS_DIR="$(python3 -c "from pathlib import Path; print(Path.home() / '.claude' / 'skills' / 'wcl-compare' / 'scripts')")"
+SCRIPTS_DIR="$(find ~/.claude/plugins/cache/parse-healer -type d -name scripts -path '*/wcl-compare/*' 2>/dev/null | head -1)"
 ```
 
 Run `wcl_collect.py` for each player:
