@@ -13,6 +13,9 @@ import re
 import sys
 from wcl_client import get_token, query
 
+# Healer spec IDs
+HEALER_SPECS = {65, 105, 256, 257, 264, 270, 1468}
+
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -198,8 +201,16 @@ def collect_combatant_info(code: str, fight_id: int, source_id: int, token: str)
     }
 
 
-def collect_tables(code: str, fight_id: int, source_id: int, token: str) -> dict:
-    """Fetch summary tables: damage, buffs, enemy debuffs."""
+def collect_tables(code: str, fight_id: int, source_id: int, token: str,
+                   is_healer: bool = False) -> dict:
+    """Fetch summary tables: damage, buffs, enemy debuffs, and healing (if healer)."""
+    heal_fields = ""
+    if is_healer:
+        heal_fields = """
+          healDone: table(dataType: Healing, fightIDs: [%d], sourceID: %d)
+          healAll: table(dataType: Healing, fightIDs: [%d])
+        """ % (fight_id, source_id, fight_id)
+
     result = query("""
     query($code: String!) {
       reportData {
@@ -208,23 +219,29 @@ def collect_tables(code: str, fight_id: int, source_id: int, token: str) -> dict
           dmgAll: table(dataType: DamageDone, fightIDs: [%d])
           buffTable: table(dataType: Buffs, fightIDs: [%d], sourceID: %d)
           enemyDebuffs: table(dataType: Debuffs, fightIDs: [%d], hostilityType: Enemies)
+          %s
         }
       }
     }
-    """ % (fight_id, source_id, fight_id, fight_id, source_id, fight_id),
+    """ % (fight_id, source_id, fight_id, fight_id, source_id, fight_id, heal_fields),
         variables={"code": code}, token=token)
     rr = result["data"]["reportData"]["report"]
-    return {
+    tables = {
         "damageDone": rr["dmgDone"]["data"],
         "damageDoneAll": rr["dmgAll"]["data"],
         "buffs": rr["buffTable"]["data"],
         "enemyDebuffs": rr["enemyDebuffs"]["data"],
     }
+    if is_healer:
+        tables["healingDone"] = rr["healDone"]["data"]
+        tables["healingDoneAll"] = rr["healAll"]["data"]
+    return tables
 
 
 def collect_player_data(
     code: str, fight_id: int, source_id: int, boss_id: int | None,
     fight_start: int, fight_end: int, token: str,
+    is_healer: bool = False,
 ) -> dict:
     """Collect all event-level data for a player."""
     print(f"  Collecting cast events...", file=sys.stderr)
@@ -249,13 +266,20 @@ def collect_player_data(
     summons = paginate_events(code, fight_id, token,
         dataType="Summons", sourceID=source_id, useAbilityIDs=False)
 
-    return {
+    result = {
         "casts": casts,
         "damage_all": dmg_all,
         "damage_boss": dmg_boss,
         "buffs": buffs,
         "summons": summons,
     }
+
+    if is_healer:
+        print(f"  Collecting healing events (all targets)...", file=sys.stderr)
+        result["healing_all"] = paginate_events(code, fight_id, token,
+            dataType="Healing", sourceID=source_id, useAbilityIDs=False)
+
+    return result
 
 
 # ── Main ─────────────────────────────────────────────────────────────────────
@@ -307,14 +331,21 @@ def collect(report_code: str, fight_id: int, player_name: str, token: str | None
     print("  Fetching combatant info...", file=sys.stderr)
     combatant = collect_combatant_info(report_code, fight_id, source_id, token)
 
+    # Detect healer
+    spec_id = combatant.get("specID")
+    is_healer = spec_id in HEALER_SPECS
+    if is_healer:
+        print(f"  Detected healer spec (specID={spec_id}), collecting healing data...",
+              file=sys.stderr)
+
     # 5. Summary tables
     print("  Fetching summary tables...", file=sys.stderr)
-    tables = collect_tables(report_code, fight_id, source_id, token)
+    tables = collect_tables(report_code, fight_id, source_id, token, is_healer=is_healer)
 
     # 6. Event-level data
     events = collect_player_data(
         report_code, fight_id, source_id, boss_id,
-        fight_start, fight_end, token,
+        fight_start, fight_end, token, is_healer=is_healer,
     )
 
     # 7. Rate limit check
@@ -347,6 +378,7 @@ def collect(report_code: str, fight_id: int, player_name: str, token: str | None
             "server": player.get("server", ""),
             "sourceID": source_id,
             "specID": combatant.get("specID"),
+            "role": "healer" if is_healer else "dps",
         },
         "boss": {
             "name": boss_name,

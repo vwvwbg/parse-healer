@@ -1,13 +1,16 @@
 ---
 name: wcl-compare
 description: >
-  Analyze World of Warcraft DPS performance using Warcraft Logs data.
+  Analyze World of Warcraft DPS or Healer performance using Warcraft Logs data.
   Compares a player's log against a benchmark (another log or auto-selected
-  from WCL rankings) across 8 dimensions: damage breakdown, cast efficiency,
-  opener, cooldown usage, DoT uptime, buff coverage, channeled spells, and stats.
+  from WCL rankings) across 8 dimensions including damage/healing breakdown,
+  cast efficiency, cooldown usage, buff coverage, and more.
+  Automatically detects whether the player is DPS or Healer and adjusts analysis
+  accordingly (HPS, overhealing, mana efficiency for healers).
   Use this skill whenever the user wants to analyze a WCL log, compare two
-  players' DPS, review raid performance, diagnose DPS issues, or understand
-  why their parse is low. Also use when the user pastes a warcraftlogs.com URL.
+  players' DPS or HPS, review raid performance, diagnose DPS/healing issues,
+  or understand why their parse is low. Also use when the user pastes a
+  warcraftlogs.com URL.
 argument-hint: <report_url> <player> [<report2_url> <player2>]
 allowed-tools: Bash(python3 *) Read WebSearch
 ---
@@ -58,7 +61,7 @@ Parse the report URL(s) to extract report code and fight ID, then collect data:
 python3 "$SCRIPTS_DIR/wcl_collect.py" "<report_url>" <player_name> -o /tmp/wcl_player1.json
 ```
 
-From the output, identify the player's class, spec, boss name, and difficulty.
+From the output, identify the player's class, spec, boss name, difficulty, and **role** (`player.role` = "healer" or "dps"). The role is auto-detected from specID.
 
 ### Step 2: Auto-Find Benchmark (Single Log Only)
 
@@ -78,21 +81,19 @@ Explain why this benchmark was chosen (rank, matching conditions, etc.).
 
 ### Step 3: Search Spec Guides
 
-Use WebSearch to find 2-3 rotation guides for the identified spec from Wowhead, Icy Veins, Method, or Maxroll.
+Use WebSearch to find 2-3 guides for the identified spec from Wowhead, Icy Veins, Method, or Maxroll.
 
-Extract and summarize these points before proceeding to analysis:
+**For DPS specs**, extract: opener sequence, priority list, DoT/debuff requirements, cooldown alignment, stat priority, common mistakes, channeled spell mechanics.
 
-1. **Opener sequence** — exact spell order for opening burst
-2. **Priority list** — ability priorities
-3. **Must-maintain debuffs/DoTs** — required uptime targets
-4. **Cooldown alignment** — which CDs should be used together
-5. **Stat priority** — secondary stat weights
-6. **Common mistakes** — known pitfalls for this spec
-7. **Channeled/cast mechanics** — spec-specific mechanics (e.g., Mind Flay clipping for Shadow Priest)
+**For Healer specs**, extract: healing priority/triage order, cooldown timing (which CDs for which boss mechanics), mana management tips, expected DPS filler rotation, stat priority, common mistakes.
 
 ### Step 4: Analyze Data
 
-Load both JSON files and run the following modules. Read `references/data-format.md` for the JSON structure details.
+Load both JSON files and run the analysis modules. Read `references/data-format.md` for the JSON structure details.
+
+**If the player is a healer** (`player.role == "healer"`), read `references/healer-modules.md` for healer-specific module definitions. The key differences: healing breakdown replaces damage breakdown, cooldown timing replaces opener analysis, mana efficiency replaces DoT uptime, and overhealing analysis is added.
+
+**DPS analysis modules** (use these when `player.role == "dps"`):
 
 #### Module A: Overview & Stats
 - Average ilvl (exclude Shirt/Tabard), stat comparison, enchant/gem check, trinkets, total DPS

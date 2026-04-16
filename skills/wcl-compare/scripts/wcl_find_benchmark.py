@@ -34,6 +34,9 @@ SPEC_NAMES = {
     1467: ("Evoker", "Devastation"), 1468: ("Evoker", "Preservation"), 1473: ("Evoker", "Augmentation"),
 }
 
+# Healer spec IDs
+HEALER_SPECS = {65, 105, 256, 257, 264, 270, 1468}
+
 # Buff names indicating external augmentation
 AUG_BUFFS = {"Ebon Might", "Prescience", "Shifting Sands"}
 EXT_PI_BUFF = "Power Infusion"
@@ -80,7 +83,7 @@ def detect_external_conditions(collected: dict) -> dict:
 
 
 def get_rankings(encounter_id: int, difficulty: int, class_name: str, spec_name: str,
-                 token: str, page: int = 1) -> dict:
+                 token: str, page: int = 1, metric: str = "dps") -> dict:
     """Fetch character rankings from WCL."""
     result = query("""
     query {
@@ -91,13 +94,13 @@ def get_rankings(encounter_id: int, difficulty: int, class_name: str, spec_name:
             specName: "%s"
             className: "%s"
             difficulty: %d
-            metric: dps
+            metric: %s
             page: %d
           )
         }
       }
     }
-    """ % (encounter_id, spec_name, class_name, difficulty, page), token=token)
+    """ % (encounter_id, spec_name, class_name, difficulty, metric, page), token=token)
     return result["data"]["worldData"]["encounter"]
 
 
@@ -186,18 +189,22 @@ def find_benchmark(collected: dict, token: str | None = None, verbose: bool = Tr
         return None
 
     class_name, spec_name = SPEC_NAMES[spec_id]
+    is_healer = spec_id in HEALER_SPECS
+    metric = "hps" if is_healer else "dps"
     my_conditions = detect_external_conditions(collected)
 
     if verbose:
-        print(f"Looking for benchmark: {class_name} {spec_name} on encounter {encounter_id} "
-              f"(D{difficulty})", file=sys.stderr)
+        role_label = "Healer" if is_healer else "DPS"
+        print(f"Looking for benchmark: {class_name} {spec_name} ({role_label}) "
+              f"on encounter {encounter_id} (D{difficulty}), metric={metric}",
+              file=sys.stderr)
         print(f"Player conditions: Aug={'Yes' if my_conditions['has_aug'] else 'No'} "
               f"({my_conditions['aug_uptime']:.0f}%), "
               f"ExtPI={'Yes' if my_conditions['has_ext_pi'] else 'No'}, "
               f"Duration={player_duration:.0f}s", file=sys.stderr)
 
     # Fetch rankings
-    enc = get_rankings(encounter_id, difficulty, class_name, spec_name, token)
+    enc = get_rankings(encounter_id, difficulty, class_name, spec_name, token, metric=metric)
     rankings = enc.get("characterRankings", {}).get("rankings", [])
 
     if not rankings:
@@ -224,21 +231,21 @@ def find_benchmark(collected: dict, token: str | None = None, verbose: bool = Tr
         # Skip #1-3 (likely padded)
         if rank <= 3:
             if verbose:
-                print(f"  Skip #{rank} {name} ({dps:,.0f} DPS, {dur:.0f}s) — top 3, likely optimized",
+                print(f"  Skip #{rank} {name} ({dps:,.0f} {metric.upper()}, {dur:.0f}s) — top 3, likely optimized",
                       file=sys.stderr)
             continue
 
         # Skip fights that are too short (< median * 0.7)
         if dur < median_dur * 0.7:
             if verbose:
-                print(f"  Skip #{rank} {name} ({dps:,.0f} DPS, {dur:.0f}s) — too short "
+                print(f"  Skip #{rank} {name} ({dps:,.0f} {metric.upper()}, {dur:.0f}s) — too short "
                       f"(< {median_dur * 0.7:.0f}s)", file=sys.stderr)
             continue
 
         # Skip fights that are much longer than median (> median * 1.5)
         if dur > median_dur * 1.5:
             if verbose:
-                print(f"  Skip #{rank} {name} ({dps:,.0f} DPS, {dur:.0f}s) — too long",
+                print(f"  Skip #{rank} {name} ({dps:,.0f} {metric.upper()}, {dur:.0f}s) — too long",
                       file=sys.stderr)
             continue
 
@@ -268,7 +275,7 @@ def find_benchmark(collected: dict, token: str | None = None, verbose: bool = Tr
 
     for c in candidates[:5]:
         if verbose:
-            print(f"  Checking #{c['rank']} {c['name']} ({c['dps']:,.0f} DPS, "
+            print(f"  Checking #{c['rank']} {c['name']} ({c['dps']:,.0f} {metric.upper()}, "
                   f"{c['duration']:.0f}s)...", file=sys.stderr)
 
         source_id = find_source_id(c["report_code"], c["fight_id"], c["name"], token)
@@ -305,7 +312,7 @@ def find_benchmark(collected: dict, token: str | None = None, verbose: bool = Tr
 
     if best and verbose:
         print(f"\n  Selected: #{best['rank']} {best['name']} "
-              f"({best['dps']:,.0f} DPS, {best['duration']:.0f}s) "
+              f"({best['dps']:,.0f} {metric.upper()}, {best['duration']:.0f}s) "
               f"score={best_score:.0f}", file=sys.stderr)
 
     return best
