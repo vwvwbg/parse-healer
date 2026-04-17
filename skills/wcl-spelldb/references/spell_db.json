@@ -1,0 +1,217 @@
+{
+  "_meta": {
+    "patch": "12.0",
+    "game_version": "Midnight Season 1",
+    "updated": "2026-04-17",
+    "note": "Healer major CDs + common raid utility. Use /wcl-spelldb to update."
+  },
+  "spells": {
+    "740": {
+      "name": "Tranquility",
+      "class": "Druid",
+      "spec": "Restoration",
+      "role": "healer",
+      "cd": 180,
+      "type": "healing_cd",
+      "note": "Major raid healing CD, channeled 4s"
+    },
+    "33891": {
+      "name": "Incarnation: Tree of Life",
+      "class": "Druid",
+      "spec": "Restoration",
+      "role": "healer",
+      "cd": 180,
+      "type": "healing_cd",
+      "note": "Enhanced healing form"
+    },
+    "208253": {
+      "name": "Essence of G'Hanir",
+      "class": "Druid",
+      "spec": "Restoration",
+      "role": "healer",
+      "cd": 90,
+      "type": "healing_cd",
+      "note": "Doubles HoT tick rate for 8s"
+    },
+    "31821": {
+      "name": "Aura Mastery",
+      "class": "Paladin",
+      "spec": "Holy",
+      "role": "healer",
+      "cd": 180,
+      "type": "raid_cd",
+      "note": "Empowers aura for the whole raid"
+    },
+    "31884": {
+      "name": "Avenging Wrath",
+      "class": "Paladin",
+      "spec": "Holy",
+      "role": "healer",
+      "cd": 120,
+      "type": "healing_cd",
+      "note": "Increases healing and damage"
+    },
+    "105809": {
+      "name": "Holy Avenger",
+      "class": "Paladin",
+      "spec": "Holy",
+      "role": "healer",
+      "cd": 180,
+      "type": "healing_cd",
+      "note": "Triples Holy Power generation"
+    },
+    "64843": {
+      "name": "Divine Hymn",
+      "class": "Priest",
+      "spec": "Holy",
+      "role": "healer",
+      "cd": 180,
+      "type": "raid_cd",
+      "note": "Major raid healing CD, channeled"
+    },
+    "265202": {
+      "name": "Holy Word: Salvation",
+      "class": "Priest",
+      "spec": "Holy",
+      "role": "healer",
+      "cd": 720,
+      "type": "raid_cd",
+      "note": "Ultra-long CD massive raid heal"
+    },
+    "62618": {
+      "name": "Power Word: Barrier",
+      "class": "Priest",
+      "spec": "Discipline",
+      "role": "healer",
+      "cd": 180,
+      "type": "raid_cd",
+      "note": "25% DR dome"
+    },
+    "271466": {
+      "name": "Luminous Barrier",
+      "class": "Priest",
+      "spec": "Discipline",
+      "role": "healer",
+      "cd": 180,
+      "type": "raid_cd",
+      "note": "Raid-wide absorb shield"
+    },
+    "98008": {
+      "name": "Spirit Link Totem",
+      "class": "Shaman",
+      "spec": "Restoration",
+      "role": "healer",
+      "cd": 180,
+      "type": "raid_cd",
+      "note": "10% DR + HP redistribution"
+    },
+    "108280": {
+      "name": "Healing Tide Totem",
+      "class": "Shaman",
+      "spec": "Restoration",
+      "role": "healer",
+      "cd": 180,
+      "type": "raid_cd",
+      "note": "Major raid HoT totem"
+    },
+    "207399": {
+      "name": "Ancestral Protection Totem",
+      "class": "Shaman",
+      "spec": "Restoration",
+      "role": "healer",
+      "cd": 300,
+      "type": "raid_cd",
+      "note": "Prevents death for allies in range"
+    },
+    "114052": {
+      "name": "Ascendance",
+      "class": "Shaman",
+      "spec": "Restoration",
+      "role": "healer",
+      "cd": 180,
+      "type": "healing_cd",
+      "note": "Distributes healing to nearby allies"
+    },
+    "115310": {
+      "name": "Revival",
+      "class": "Monk",
+      "spec": "Mistweaver",
+      "role": "healer",
+      "cd": 180,
+      "type": "raid_cd",
+      "note": "Instant massive raid heal + dispel"
+    },
+    "388615": {
+      "name": "Restoral",
+      "class": "Monk",
+      "spec": "Mistweaver",
+      "role": "healer",
+      "cd": 180,
+      "type": "raid_cd",
+      "note": "Alternative to Revival"
+    },
+    "322118": {
+      "name": "Invoke Yu'lon, the Jade Serpent",
+      "class": "Monk",
+      "spec": "Mistweaver",
+      "role": "healer",
+      "cd": 120,
+      "type": "healing_cd",
+      "note": "Summons Jade Serpent for AoE healing"
+    },
+    "325197": {
+      "name": "Invoke Chi-Ji, the Red Crane",
+      "class": "Monk",
+      "spec": "Mistweaver",
+      "role": "healer",
+      "cd": 120,
+      "type": "healing_cd",
+      "note": "Summons Red Crane, heals via damage"
+    },
+    "363534": {
+      "name": "Rewind",
+      "class": "Evoker",
+      "spec": "Preservation",
+      "role": "healer",
+      "cd": 240,
+      "type": "raid_cd",
+      "note": "Rewinds all allies HP by 3s"
+    },
+    "370960": {
+      "name": "Emerald Communion",
+      "class": "Evoker",
+      "spec": "Preservation",
+      "role": "healer",
+      "cd": 180,
+      "type": "healing_cd",
+      "note": "Channeled self-heal that distributes to allies"
+    },
+    "97462": {
+      "name": "Rallying Cry",
+      "class": "Warrior",
+      "spec": "all",
+      "role": "utility",
+      "cd": 180,
+      "type": "raid_cd",
+      "note": "15% max HP for raid for 10s"
+    },
+    "196718": {
+      "name": "Darkness",
+      "class": "Demon Hunter",
+      "spec": "all",
+      "role": "utility",
+      "cd": 300,
+      "type": "raid_cd",
+      "note": "20% avoid all damage for 8s"
+    },
+    "51052": {
+      "name": "Anti-Magic Zone",
+      "class": "Death Knight",
+      "spec": "all",
+      "role": "utility",
+      "cd": 180,
+      "type": "raid_cd",
+      "note": "20% magic DR dome"
+    }
+  }
+}

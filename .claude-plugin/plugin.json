@@ -1,7 +1,7 @@
 {
   "name": "parse-healer",
   "description": "Analyze WoW DPS and Healer performance by comparing Warcraft Logs data against top-ranked players and spec guides",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "author": {
     "name": "vwvwbg"
   },

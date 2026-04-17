@@ -5,3 +5,6 @@ __pycache__/
 *.json
 !.env.example
 !.claude-plugin/*.json
+!skills/**/spell_db.json
+.windsurf/
+/stt
